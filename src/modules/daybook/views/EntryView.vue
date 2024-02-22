@@ -50,10 +50,12 @@
         @on:click="saveEntry"
     />
 
-    <!-- <img 
-        src="https://adrianalonso.es/wp-content/uploads/2018/01/vue.jpg" 
+    <img 
+        v-if="entry.picture && !localImag"
+        :src="entry.picture" 
         alt="entry-picture"
-        class="img-thumbnail"> -->
+        class="img-thumbnail">
+
     <img 
         v-if="localImage"
         :src="localImage" 
@@ -68,6 +70,7 @@ import { mapGetters, mapActions } from 'vuex'; //Computed!!
 import Swal from 'sweetalert2'
 
 import getDayMonthYear from "../helpers/getDayMonthYear";
+import uploadImage from '../helpers/uploadImage';
 
 export default {
     props:{
@@ -104,6 +107,8 @@ export default {
 
             let entry;
 
+            this.localImag = null
+
             if(this.id === 'new' ){
                 entry = {
                     text: '',
@@ -127,6 +132,9 @@ export default {
             })
             Swal.showLoading()
 
+            const picture = await uploadImage( this.file )
+            this.entry.picture = picture
+
             if( this.entry.id ){
 
                 // Actualizar
@@ -142,7 +150,7 @@ export default {
             }
 
             Swal.fire('Guardado', 'Entrada registrada con éxito', 'success')
-
+            this.file = null
         },
 
         async onDeleteEntry(){
